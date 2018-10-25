@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# define SourcePath, seperated by a whitespace.
+SourcePath=
+SourceFiles=$(find $SourcePath -name *.java)
+
+# define InternalSourcePath, seperated by a whitespace.
+InternalSourcePath=
+InternalSourceFiles=$(find $InternalSourcePath -name *.java)
+
+
+# define ClassPath for SourcePath compile, seperated by ':'.
+ClassPath=
+
+
+rm -rf apiExternal
+javadoc -encoding UTF-8 -charset UTF-8 -bootclasspath $ClassPath -doclet com.lanbo.doc.ApiExternalDoclet -docletpath ../bin $SourceFiles
+
+rm -rf apiInternal
+javadoc -encoding UTF-8 -charset UTF-8 -bootclasspath $ClassPath -doclet com.lanbo.doc.ApiInternalDoclet -docletpath ../bin $InternalSourceFiles
+
+cp ./sdk_sample.css apiExternal/
+cp ./script.js apiExternal/
+
+cp ./sdk_sample.css apiInternal/
+cp ./script.js apiInternal/
+
