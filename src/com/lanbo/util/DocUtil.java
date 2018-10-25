@@ -1,5 +1,6 @@
 package com.lanbo.util;
 
+import com.lanbo.doc.constant.DocConstant;
 import com.sun.javadoc.Doc;
 
 public class DocUtil {
@@ -13,6 +14,6 @@ public class DocUtil {
 	public static boolean isApi(Doc doc) {
 		doc.commentText();
 		String comment = doc.getRawCommentText();
-		return comment.indexOf("@api") != -1;
+		return comment.indexOf(DocConstant.apiTagName) != -1;
 	}
 }

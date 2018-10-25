@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.lanbo.doc.convert.Converter;
-import com.lanbo.doc.convert.TypeInfo;
+import com.lanbo.doc.info.TypeInfo;
 import com.lanbo.util.DocUtil;
 import com.lanbo.util.TextUtil;
 import com.sun.javadoc.ClassDoc;

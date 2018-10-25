@@ -1,212 +1,169 @@
 package com.lanbo.doc.convert;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.List;
 
+import com.lanbo.doc.info.AnnotationInstanceInfo;
+import com.lanbo.doc.info.AnnotationValueInfo;
+import com.lanbo.doc.info.ClassInfo;
+import com.lanbo.doc.info.FieldInfo;
+import com.lanbo.doc.info.MethodInfo;
+import com.lanbo.doc.info.PackageInfo;
+import com.lanbo.doc.info.ParameterInfo;
+import com.lanbo.doc.info.SourcePositionInfo;
+import com.lanbo.doc.info.TypeInfo;
+import com.sun.javadoc.AnnotationDesc;
+import com.sun.javadoc.AnnotationValue;
 import com.sun.javadoc.ClassDoc;
+import com.sun.javadoc.ConstructorDoc;
+import com.sun.javadoc.ExecutableMemberDoc;
+import com.sun.javadoc.FieldDoc;
+import com.sun.javadoc.MethodDoc;
+import com.sun.javadoc.PackageDoc;
+import com.sun.javadoc.Parameter;
+import com.sun.javadoc.RootDoc;
+import com.sun.javadoc.SourcePosition;
 import com.sun.javadoc.Type;
 
 public class Converter {
-	
-	
-	
-	private abstract static class Cache {
-		void put(Object key, Object value) {
-			mCache.put(key, value);
-		}
+    public static RootDoc root;
+    
+    public static void makeInfo(RootDoc r) {
+        root = r;
 
-		Object obtain(Object o) {
-			if (o == null) {
-				return null;
-			}
-			Object k = keyFor(o);
-			Object r = mCache.get(k);
-			if (r == null) {
-				r = make(o);
-				mCache.put(k, r);
-				made(o, r);
-			}
-			return r;
-		}
+        ConvertClass.makeInfo(r);
+    }
 
-		protected HashMap<Object, Object> mCache = new HashMap<Object, Object>();
+    // ///////////////////////////////////////////////////
+    // Package
+    // ///////////////////////////////////////////////////
+    public static PackageInfo obtainPackage(PackageDoc o) {
+        return ConvertPackage.obtainPackage(o);
+    }
 
-		protected abstract Object make(Object o);
+    public static PackageInfo obtainPackage(String packageName) {
+        return ConvertPackage.obtainPackage(packageName);
+    }
 
-		protected void made(Object o, Object r) {
-		}
+    // ///////////////////////////////////////////////////
+    // Class
+    // ///////////////////////////////////////////////////
+    public static ClassInfo obtainClass(ClassDoc o) {
+        return ConvertClass.obtainClass(o);
+    }
 
-		protected Object keyFor(Object o) {
-			return o;
-		}
+    public static ClassInfo obtainClass(String className) {
+        return ConvertClass.obtainClass(className);
+    }
 
-		Object[] all() {
-			return null;
-		}
-	}
+    public static ClassInfo[] convertClasses(ClassDoc[] classes) {
+        return ConvertClass.convertClasses(classes);
+    }
 
-	private static Cache mTypes = new Cache() {
-		@Override
-		protected Object make(Object o) {
-			Type t = (Type) o;
-			String simpleTypeName;
-			if (t instanceof ClassDoc) {
-				simpleTypeName = ((ClassDoc) t).name();
-			} else {
-				simpleTypeName = t.simpleTypeName();
-			}
-			TypeInfo ti = new TypeInfo(t.isPrimitive(), t.dimension(),
-					simpleTypeName, t.qualifiedTypeName(), null);
-			return ti;
-		}
+    // ///////////////////////////////////////////////////
+    // Field
+    // ///////////////////////////////////////////////////
+    /**
+     * Converts FieldDoc[] into List<FieldInfo>. No filtering is done.
+     */
+    public static List<FieldInfo> convertAllFields(FieldDoc[] fields) {
+        return ConvertField.convertAllFields(fields);
+    }
 
-		@Override
-		protected void made(Object o, Object r) {
-			Type t = (Type) o;
-			TypeInfo ti = (TypeInfo) r;
-			if (t.asParameterizedType() != null) {
-				ti.setTypeArguments(new ArrayList<TypeInfo>(Arrays
-						.asList(Converter.convertTypes(t.asParameterizedType()
-								.typeArguments()))));
-			} else if (t instanceof ClassDoc) {
-				ti.setTypeArguments(new ArrayList<TypeInfo>(Arrays
-						.asList(Converter.convertTypes(((ClassDoc) t)
-								.typeParameters()))));
-			} else if (t.asTypeVariable() != null) {
-				ti.setBounds(
-						null,
-						new ArrayList<TypeInfo>(Arrays.asList(Converter
-								.convertTypes((t.asTypeVariable().bounds())))));
-				ti.setIsTypeVariable(true);
-			} else if (t.asWildcardType() != null) {
-				ti.setIsWildcard(true);
-				ti.setBounds(
-						new ArrayList<TypeInfo>(
-								Arrays.asList(Converter.convertTypes(t
-										.asWildcardType().superBounds()))),
-						new ArrayList<TypeInfo>(Arrays.asList(Converter
-								.convertTypes(t.asWildcardType()
-										.extendsBounds()))));
-			}
-		}
+    public static FieldInfo[] convertFields(FieldDoc[] fields) {
+        return ConvertField.convertFields(fields);
+    }
 
-		@Override
-		protected Object keyFor(Object o) {
-			Type t = (Type) o;
-			String keyString = o.getClass().getName() + "/" + o.toString()
-					+ "/";
-			if (t.asParameterizedType() != null) {
-				keyString += t.asParameterizedType().toString() + "/";
-				if (t.asParameterizedType().typeArguments() != null) {
-					for (Type ty : t.asParameterizedType().typeArguments()) {
-						keyString += ty.toString() + "/";
-					}
-				}
-			} else {
-				keyString += "NoParameterizedType//";
-			}
-			if (t.asTypeVariable() != null) {
-				keyString += t.asTypeVariable().toString() + "/";
-				if (t.asTypeVariable().bounds() != null) {
-					for (Type ty : t.asTypeVariable().bounds()) {
-						keyString += ty.toString() + "/";
-					}
-				}
-			} else {
-				keyString += "NoTypeVariable//";
-			}
-			if (t.asWildcardType() != null) {
-				keyString += t.asWildcardType().toString() + "/";
-				if (t.asWildcardType().superBounds() != null) {
-					for (Type ty : t.asWildcardType().superBounds()) {
-						keyString += ty.toString() + "/";
-					}
-				}
-				if (t.asWildcardType().extendsBounds() != null) {
-					for (Type ty : t.asWildcardType().extendsBounds()) {
-						keyString += ty.toString() + "/";
-					}
-				}
-			} else {
-				keyString += "NoWildCardType//";
-			}
+    public static FieldInfo obtainField(FieldDoc o) {
+        return ConvertField.obtainField(o);
+    }
 
-			return keyString;
-		}
-	};
+    public static FieldInfo obtainField(ConstructorDoc o) {
+        return ConvertField.obtainField(o);
+    }
 
-	public static TypeInfo[] convertTypes(Type[] p) {
-		if (p == null)
-			return null;
-		int len = p.length;
-		TypeInfo[] q = new TypeInfo[len];
-		for (int i = 0; i < len; i++) {
-			q[i] = Converter.obtainType(p[i]);
-		}
-		return q;
-	}
+    // ///////////////////////////////////////////////////
+    // Method
+    // ///////////////////////////////////////////////////
+    /**
+     * Converts ExecutableMemberDoc[] into List<MethodInfo>. No filtering is
+     * done.
+     */
+    public static List<MethodInfo> convertAllMethods(ExecutableMemberDoc[] methods) {
+        return ConvertMethod.convertAllMethods(methods);
+    }
 
-	public static TypeInfo obtainType(Type o) {
-		return (TypeInfo) mTypes.obtain(o);
-	}
+    /**
+     * Convert MethodDoc[] or ConstructorDoc[] into MethodInfo[]. Also filters
+     * according to the -private, -public option, because the filtering doesn't
+     * seem to be working in the ClassDoc.constructors(boolean) call.
+     */
+    public static MethodInfo[] convertMethods(ExecutableMemberDoc[] methods) {
+        return ConvertMethod.convertMethods(methods);
+    }
 
-	public static TypeInfo obtainTypeFromString(String type) {
-		return (TypeInfo) mTypesFromString.obtain(type);
-	}
+    public static MethodInfo[] convertNonWrittenConstructors(ConstructorDoc[] methods) {
+        return ConvertMethod.convertNonWrittenConstructors(methods);
+    }
 
-	private static final Cache mTypesFromString = new Cache() {
-		@Override
-		protected Object make(Object o) {
-			String name = (String) o;
-			return new TypeInfo(name);
-		}
+    public static <E extends ExecutableMemberDoc> MethodInfo obtainMethod(E o) {
+        return ConvertMethod.obtainMethod(o);
+    }
 
-		@Override
-		protected void made(Object o, Object r) {
+    public static MethodInfo[] getHiddenMethods(MethodDoc[] methods) {
+        return ConvertMethod.getHiddenMethods(methods);
+    }
 
-		}
+    // Gets the removed methods regardless of access levels
+    public static MethodInfo[] getRemovedMethods(MethodDoc[] methods) {
+        return ConvertMethod.getRemovedMethods(methods);
+    }
 
-		@Override
-		protected Object keyFor(Object o) {
-			return o;
-		}
-	};
-	
-	/**
-	static ClassInfo obtainClass(ClassDoc o) {
-		return (ClassInfo) mClasses.obtain(o);
-	}
+    // ///////////////////////////////////////////////////
+    // Parameter
+    // ///////////////////////////////////////////////////
+    public static ParameterInfo convertParameter(Parameter p, SourcePosition pos, boolean isVarArg) {
+        return ConvertParameter.convertParameter(p, pos, isVarArg);
+    }
 
-	private static Cache mClasses = new Cache() {
-		@Override
-		protected Object make(Object o) {
-			ClassDoc c = (ClassDoc) o;
-			ClassInfo cl = new ClassInfo(c, c.getRawCommentText(),
-					Converter.convertSourcePosition(c.position()),
-					c.isPublic(), c.isProtected(), c.isPackagePrivate(),
-					c.isPrivate(), c.isStatic(), c.isInterface(),
-					c.isAbstract(), c.isOrdinaryClass(), c.isException(),
-					c.isError(), c.isEnum(), (c instanceof AnnotationTypeDoc),
-					c.isFinal(), c.isIncluded(), c.name(), c.qualifiedName(),
-					c.qualifiedTypeName(), c.isPrimitive());
-			if (mClassesNeedingInit != null) {
-				mClassesNeedingInit.add(new ClassNeedingInit(c, cl));
-			}
-			return cl;
-		}
+    public static ParameterInfo[] convertParameters(Parameter[] p, ExecutableMemberDoc m) {
+        return ConvertParameter.convertParameters(p, m);
+    }
 
-		@Override
-		protected void made(Object o, Object r) {
-			if (mClassesNeedingInit == null) {
-				initClass((ClassDoc) o, (ClassInfo) r);
-				((ClassInfo) r).init2();
-			}
-		}
+    // ///////////////////////////////////////////////////
+    // Type
+    // ///////////////////////////////////////////////////
+    public static TypeInfo[] convertTypes(Type[] p) {
+        return ConvertType.convertTypes(p);
+    }
 
-		@Override
-		ClassInfo[] all() {
-			return mCache.values().toArray(new ClassInfo[mCache.size()]);
-		}
-	};*/
+    public static TypeInfo obtainType(Type o) {
+        return ConvertType.obtainType(o);
+    }
+
+    public static TypeInfo obtainTypeFromString(String type) {
+        return ConvertType.obtainTypeFromString(type);
+    }
+
+    // ///////////////////////////////////////////////////
+    // Type
+    // ///////////////////////////////////////////////////
+    public static AnnotationInstanceInfo[] convertAnnotationInstances(AnnotationDesc[] orig) {
+        return ConvertAnnotation.convertAnnotationInstances(orig);
+    }
+
+    public static AnnotationInstanceInfo obtainAnnotationInstance(AnnotationDesc o) {
+        return ConvertAnnotation.obtainAnnotationInstance(o);
+    }
+
+    public static AnnotationValueInfo obtainAnnotationValue(AnnotationValue o, MethodInfo element) {
+        return ConvertAnnotation.obtainAnnotationValue(o, element);
+    }
+
+    public static SourcePositionInfo convertSourcePosition(SourcePosition sp) {
+        if (sp == null) {
+            return null;
+        }
+        return new SourcePositionInfo(sp.file().toString(), sp.line(), sp.column());
+    }
+
 }
