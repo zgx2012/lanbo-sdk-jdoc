@@ -47,4 +47,11 @@ public class FileUtil {
 		return true;
 	}
 
+    // recursively create the directories to the output
+    public static void ensureDirectory(File f) {
+        File parent = f.getParentFile();
+        if (parent != null) {
+            parent.mkdirs();
+        }
+    }
 }

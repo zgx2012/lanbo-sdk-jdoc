@@ -36,7 +36,7 @@ public class AnnotationInstanceInfo {
     mElementValues = new ArrayList<AnnotationValueInfo>(Arrays.asList(elementValues));
   }
 
-  ClassInfo type() {
+  public ClassInfo type() {
     return mType;
   }
 

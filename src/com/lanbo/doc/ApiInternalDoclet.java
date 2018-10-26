@@ -1,14 +1,9 @@
 package com.lanbo.doc;
 
-import java.util.ArrayList;
-
 import com.lanbo.doc.convert.Comment;
-import com.lanbo.doc.convert.ConvertClass;
 import com.lanbo.doc.convert.Converter;
-import com.lanbo.doc.info.ClassInfo;
-import com.lanbo.doc.info.FieldInfo;
-import com.lanbo.doc.info.MethodInfo;
 import com.lanbo.doc.info.TagInfo;
+import com.lanbo.doc.stub.Stubs;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.RootDoc;
 
@@ -31,23 +26,26 @@ public class ApiInternalDoclet extends ApiDoclet {
     private static boolean lanboDocStart(RootDoc root) {
         Converter.makeInfo(root);
 
-        ClassInfo[] all = ConvertClass.allClasses();
-        for (int i = 0; i < all.length; i++) {
+        //ClassInfo[] all = ConvertClass.allClasses();//allClasses();
+        /*for (int i = 0; i < all.length; i++) {
             ClassInfo classInfo = all[i];
-            
+            if (classInfo.isApi()) System.out.println(classInfo.toString() + "\t\t=");
+            else System.out.println(classInfo.toString());
+
             if (!classInfo.comment().isApi())
-               continue;
-            
+                continue;
+
             System.out.println("==========================");
             printComment(classInfo.comment());
             System.out.println(classInfo.toString());
-            
+
             System.out.println("{");
-            
+
             ArrayList<FieldInfo> fieldInfos = classInfo.fields();
             for (int j = 0; j < fieldInfos.size(); j++) {
                 FieldInfo fieldInfo = fieldInfos.get(j);
-                if (!fieldInfo.comment().isApi()) continue;
+                if (!fieldInfo.comment().isApi())
+                    continue;
                 printComment(fieldInfo.comment());
                 System.out.println("\t" + fieldInfo.name());
             }
@@ -57,26 +55,34 @@ public class ApiInternalDoclet extends ApiDoclet {
             ArrayList<MethodInfo> methodInfos = classInfo.selfMethods();
             for (int j = 0; j < methodInfos.size(); j++) {
                 MethodInfo methodInfo = methodInfos.get(j);
-                if (!methodInfo.comment().isApi()) continue;
+                if (!methodInfo.comment().isApi())
+                    continue;
                 printComment(methodInfo.comment());
                 System.out.println("\t" + methodInfo.toString());
             }
             System.out.println("};");
-        }
+        }*/
         // 文档输出
 
         // Stubs
-        /*
-         * if (processInternal()) {// 内部SDK if (stubsDir != null || apiFile !=
-         * null) { InternalStubs.writeStubsAndApi(stubsDir, apiFile,
-         * stubPackages); } } else {// 外部SDK // Stubs if (stubsDir != null ||
-         * apiFile != null || proguardFile != null || removedApiFile != null) {
-         * ExternalStubs.writeStubsAndApi(stubsDir, apiFile, proguardFile,
-         * removedApiFile, stubPackages); } }
-         */
+
+//        if (processInternal()) {
+//            // 内部SDK
+//            if (stubsDir != null || apiFile != null) {
+//                InternalStubs.writeStubsAndApi(stubsDir, apiFile, stubPackages);
+//            }
+//        } else {
+            // 外部SDK Stubs
+            //if (stubsDir != null || apiFile != null || proguardFile != null
+            //        || removedApiFile != null) {
+                Stubs.writeStubsAndApi("stubs/src", null, null, null,
+                        null);
+            //}
+        //}
+
         return true;
     }
-    
+
     private static void printComment(Comment comment) {
         TagInfo[] tagInfos = comment.zhDescTags();
         for (int j = 0; j < tagInfos.length; j++) {

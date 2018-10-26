@@ -149,6 +149,37 @@ public class PackageInfo extends DocInfo implements ContainerInfo {
         return isHidden() || isRemoved();
     }
 
+    public boolean isApi() {
+        if (mApi == null) {
+            if (hasApiComment()) {
+                // We change the api value of the package if a class wants to
+                // be not api.
+                ClassInfo[][] types = new ClassInfo[][] { annotations(), interfaces(),
+                        ordinaryClasses(), enums(), exceptions() };
+                for (ClassInfo[] type : types) {
+                    if (type != null) {
+                        for (ClassInfo c : type) {
+                            if (c.hasShowAnnotation()) {
+                                mApi = false;
+                                return false;
+                            }
+                        }
+                    }
+                }
+                mApi = true;
+            } else {
+                mApi = false;
+            }
+        }
+        return mApi;
+    }
+    
+    public boolean hasApiComment() {
+        if (mApiByComment == null) {
+            mApiByComment = comment().isApi();
+        }
+        return mApiByComment;
+    }
     /**
      * Used by ClassInfo to determine packages default visability before
      * annoations.
@@ -266,6 +297,8 @@ public class PackageInfo extends DocInfo implements ContainerInfo {
         return mName.hashCode();
     }
 
+    private Boolean mApi = null;
+    private Boolean mApiByComment = null;
     private Boolean mHidden = null;
     private Boolean mHiddenByComment = null;
     private Boolean mRemoved = null;

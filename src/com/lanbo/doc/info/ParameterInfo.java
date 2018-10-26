@@ -39,27 +39,27 @@ public class ParameterInfo {
         mIsVarArg, mPosition, mAnnotations);
   }
 
-  TypeInfo type() {
+  public TypeInfo type() {
     return mType;
   }
 
-  String name() {
+  public String name() {
     return mName;
   }
 
-  String typeName() {
+  public String typeName() {
     return mTypeName;
   }
 
-  SourcePositionInfo position() {
+  public SourcePositionInfo position() {
     return mPosition;
   }
 
-  boolean isVarArg() {
+  public boolean isVarArg() {
     return mIsVarArg;
   }
 
-  List<AnnotationInstanceInfo> annotations() {
+  public List<AnnotationInstanceInfo> annotations() {
     return mAnnotations;
   }
 

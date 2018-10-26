@@ -413,6 +413,7 @@ public class Comment {
             } else if (name.equals("@gsApi")) {
                 mApi = true;
             }
+        } else if (name.equals("@date")) {
         } else {
             boolean known = KNOWN_TAGS.contains(name);
             if (!known) {

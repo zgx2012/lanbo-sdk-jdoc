@@ -47,6 +47,13 @@ public abstract class DocInfo {
 	public boolean isRemoved() {
 		return comment().isRemoved();
 	}
+	
+	/**
+     * @return true if the element is a part of public API
+     */
+	public boolean isApi() {
+	    return comment().isApi();
+	}
 
 	/**
 	 * Hidden and removed elements should not be appear in api.txt files, nor

@@ -492,7 +492,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
 		return mRealInterfaces;
 	}
 
-	ArrayList<TypeInfo> realInterfaceTypes() {
+	public ArrayList<TypeInfo> realInterfaceTypes() {
 		return mRealInterfaceTypes;
 	}
 
@@ -1198,6 +1198,24 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
 			}
 		}*/
 	}
+
+	public boolean isApi() {
+        ClassInfo cl = this;
+        while (cl != null) {
+            if (cl.hasShowAnnotation()) {
+                return false;
+            }
+            PackageInfo pkg = cl.containingPackage();
+            if (pkg != null && pkg.hasApiComment()) {
+                return true;
+            }
+            if (cl.comment().isApi()) {
+                return true;
+            }
+            cl = cl.containingClass();
+        }
+        return false;
+    }
 
 	@Override
 	public boolean isHidden() {
