@@ -599,11 +599,11 @@ public class Stubs {
         if (cl.isFinal() && !cl.isEnum()) {
             stream.print("final ");
         }
-        if (false) {
+        /*if (false) {
             stream.print("strictfp ");
-        }
+        }*/
 
-        HashSet<String> classDeclTypeVars = new HashSet();
+        HashSet<String> classDeclTypeVars = new HashSet<String>();
         String leafName = cl.asTypeInfo().fullName(classDeclTypeVars);
         int bracket = leafName.indexOf('<');
         if (bracket < 0)
@@ -797,11 +797,11 @@ public class Stubs {
         if (method.isNative()) {
             stream.print("native ");
         }
-        if (false /* method.isStictFP() */) {
-            stream.print("strictfp ");
-        }
+        //if (false /* method.isStictFP() */) {
+        //    stream.print("strictfp ");
+        //}
 
-        stream.print(method.typeArgumentsName(new HashSet()) + " ");
+        stream.print(method.typeArgumentsName(new HashSet<String>()) + " ");
 
         if (!isConstructor) {
             stream.print(method.returnType().fullName(method.typeVariables()) + " ");
@@ -1073,7 +1073,7 @@ public class Stubs {
         final PackageInfo[] packages = pkgs.toArray(new PackageInfo[pkgs.size()]);
         Arrays.sort(packages, PackageInfo.comparator);
 
-        HashSet<ClassInfo> notStrippable = new HashSet();
+        HashSet<ClassInfo> notStrippable = new HashSet<ClassInfo>();
         for (PackageInfo pkg : packages) {
             for (ClassInfo cl : pkg.allClasses().values()) {
                 notStrippable.add(cl);
@@ -1374,7 +1374,7 @@ public class Stubs {
         final PackageInfo[] packages = pkgs.toArray(new PackageInfo[pkgs.size()]);
         Arrays.sort(packages, PackageInfo.comparator);
 
-        HashSet<ClassInfo> notStrippable = new HashSet();
+        HashSet<ClassInfo> notStrippable = new HashSet<ClassInfo>();
         for (PackageInfo pkg : packages) {
             for (ClassInfo cl : pkg.allClasses().values()) {
                 notStrippable.add(cl);
@@ -1555,15 +1555,16 @@ public class Stubs {
             apiWriter.print(fullParameterTypeName(method, pi.type(),
                     pi == params.get(params.size() - 1)));
             // turn on to write the names too
-            if (false) {
+            /*if (false) {
                 apiWriter.print(" ");
                 apiWriter.print(pi.name());
-            }
+            }*/
         }
 
         apiWriter.print(")");
     }
 
+    @SuppressWarnings("unchecked")
     static void writeThrowsApi(PrintStream apiWriter, ArrayList<ClassInfo> exceptions) {
         // write in a canonical order
         exceptions = (ArrayList<ClassInfo>) exceptions.clone();
@@ -1572,8 +1573,8 @@ public class Stubs {
         boolean first = true;
         for (ClassInfo ex : exceptions) {
             // Turn this off, b/c we need to regenrate the old xml files.
-            if (true || !"java.lang.RuntimeException".equals(ex.qualifiedName())
-                    && !ex.isDerivedFrom("java.lang.RuntimeException")) {
+            if (true/* || !"java.lang.RuntimeException".equals(ex.qualifiedName())
+                    && !ex.isDerivedFrom("java.lang.RuntimeException")*/) {
                 if (first) {
                     apiWriter.print(" throws ");
                     first = false;

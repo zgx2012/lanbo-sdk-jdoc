@@ -1,0 +1,12 @@
+#!/bin/bash
+find stubs/src -name "*.java" > stubs/sources.list
+mkdir -p stubs/classes
+
+javac -d stubs/classes -encoding UTF-8 -cp classes.jar -g -sourcepath stubs/src $(cat stubs/sources.list)
+
+#jar cvf stubs/classes.jar -C stubs/classes/ .
+jar cf stubs/classes.jar -C stubs/classes/ .
+cp stubs/classes.jar lanboapi.jar
+
+rm -rf stubs/sources.list
+

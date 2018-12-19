@@ -77,6 +77,16 @@ public class HtmlBody extends HtmlBase implements IHtmlBody {
 			}
 		}
 
+		tags = doc.tags("device");
+        if (tags.length > 0) {
+            desc.append("<h3>").append(isZh() ? "支持的产品:" : "Supported Products:")
+                    .append("</h3><p>");
+            for (int j = 0; j < tags.length; j++) {
+                desc.append(tags[j].text());
+            }
+            desc.append("</p>");
+        }
+
 		return desc.toString();
 	}
 
@@ -312,7 +322,7 @@ public class HtmlBody extends HtmlBase implements IHtmlBody {
 		if (isZh()) {
 			body.append("<h2>成员和常量</h2>");
 		} else {
-			body.append("<h2>Method & Member</h2>");
+			body.append("<h2>Member & Constant</h2>");
 		}
 		body.append(genBodyMemberBlock()).append("<br/>");
 		return body.toString();

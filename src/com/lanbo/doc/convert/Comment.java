@@ -396,7 +396,7 @@ public class Comment {
             mInlineTagsList.add(new SampleTagInfo(name, "@include", text, mBase, pos));
         } else if (name.equals("@apiNote") || name.equals("@implSpec") || name.equals("@implNote")) {
             mTagsList.add(new ParsedTagInfo(name, name, text, mBase, pos));
-        } else if (name.equals("@gsApi") || name.equals("@param_en") || name.equals("@param_zh")
+        } else if (name.equals("@gsApi") || name.equals("@device") || name.equals("@param_en") || name.equals("@param_zh")
                 || name.equals("@en") || name.equals("@zh") || name.equals("@return_en") || name.equals("@return_zh")) {
             if (name.equals("@param_en")) {
                 mEnParamTagsList.add(new TextTagInfo("@param_en", "@param_en", text, pos));
@@ -412,6 +412,8 @@ public class Comment {
                 mZhDescTagsList.add(new TextTagInfo("@zh", "@zh", text, pos));
             } else if (name.equals("@gsApi")) {
                 mApi = true;
+            } else if (name.equals("@device")) {
+                mDeviceTagsList.add(new TextTagInfo("@device", "@device", text, pos));
             }
         } else if (name.equals("@date")) {
         } else {
@@ -503,6 +505,10 @@ public class Comment {
     public TagInfo[] zhDescTags() {
         init();
         return mZhDescTags;
+    }
+    public TagInfo[] deviceTags() {
+        init();
+        return mDeviceTags;
     }
     
     public TagInfo[] blockTags() {
@@ -638,6 +644,7 @@ public class Comment {
         mZhReturnTags = mZhReturnTagsList.toArray(TagInfo.getArray(mZhReturnTagsList.size()));
         mEnDescTags = mEnDescTagsList.toArray(TagInfo.getArray(mEnDescTagsList.size()));
         mZhDescTags = mZhDescTagsList.toArray(TagInfo.getArray(mZhDescTagsList.size()));
+        mDeviceTags = mDeviceTagsList.toArray(TagInfo.getArray(mDeviceTagsList.size()));
         
         mEnParamTagsList = null;
         mZhParamTagsList = null;
@@ -645,6 +652,7 @@ public class Comment {
         mZhReturnTagsList = null;
         mEnDescTagsList = null;
         mZhDescTagsList = null;
+        mDeviceTagsList = null;
 
         mTagsList = null;
         mParamTagsList = null;
@@ -698,12 +706,15 @@ public class Comment {
     TagInfo[] mZhReturnTags;
     TagInfo[] mEnDescTags;
     TagInfo[] mZhDescTags;
+    TagInfo[] mDeviceTags;
+    
     ArrayList<TagInfo> mEnParamTagsList = new ArrayList<TagInfo>();
     ArrayList<TagInfo> mZhParamTagsList = new ArrayList<TagInfo>();
     ArrayList<TagInfo> mEnReturnTagsList = new ArrayList<TagInfo>();
     ArrayList<TagInfo> mZhReturnTagsList = new ArrayList<TagInfo>();
     ArrayList<TagInfo> mEnDescTagsList = new ArrayList<TagInfo>();
     ArrayList<TagInfo> mZhDescTagsList = new ArrayList<TagInfo>();
+    ArrayList<TagInfo> mDeviceTagsList = new ArrayList<TagInfo>();
     
     public boolean isApi() {
         if (mApi == null) {

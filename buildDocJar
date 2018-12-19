@@ -1,0 +1,13 @@
+#!/bin/bash
+
+find src -name "*.java" > sources.list
+mkdir -p classes
+
+javac -d classes -encoding UTF-8 -Xlint:unchecked -cp libs/tools.jar -g -sourcepath src $(cat sources.list)
+
+#jar cvf classes.jar -C classes/ .
+jar cf classes.jar -C classes/ .
+cp classes.jar lanbodoc.jar
+
+rm -rf sources.list
+

@@ -11,13 +11,16 @@ InternalSourceFiles=$(find $InternalSourcePath -name *.java)
 
 # define ClassPath for SourcePath compile, seperated by ':'.
 ClassPath=
+#ClassPath="$ClassPath $SDK_HOME/platforms/android-26/android.jar"
 
 
 rm -rf apiExternal
-javadoc -encoding UTF-8 -charset UTF-8 -bootclasspath $ClassPath -doclet com.lanbo.doc.ApiExternalDoclet -docletpath ../bin $SourceFiles
+javadoc -encoding UTF-8 -charset UTF-8 -bootclasspath $ClassPath -doclet com.lanbo.doc.ApiExternalDoclet -docletpath ../classes $SourceFiles
 
 rm -rf apiInternal
-javadoc -encoding UTF-8 -charset UTF-8 -bootclasspath $ClassPath -doclet com.lanbo.doc.ApiInternalDoclet -docletpath ../bin $InternalSourceFiles
+javadoc -encoding UTF-8 -charset UTF-8 -bootclasspath $ClassPath -doclet com.lanbo.doc.ApiInternalDoclet -docletpath ../classes $InternalSourceFiles
+
+javadoc -encoding UTF-8 -charset UTF-8 -bootclasspath $ClassPath -doclet com.lanbo.doc.ApiStubDoclet -docletpath ../classes $InternalSourceFiles
 
 cp ./sdk_sample.css apiExternal/
 cp ./script.js apiExternal/
